@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dija Shqiptare – Asistenti AI nga Drilon Avdyli</title>
+<meta name="author" content="Drilon Avdyli">
+<meta name="description" content="Dija Shqiptare – chat AI në shqip, krijuar nga Drilon Avdyli.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f2ef; --panel:#ffffff; --side:#e8e9e5; --ink:#17181c; --muted:#686b73; --line:#d9dbd5;
+  --accent:#b3122a; --accent-ink:#ffffff; --link:#a30f25; --ubg:#17181c; --utx:#f5f5f2; --soft:#e6e8e3;
+  --code:#14151a; --code-ink:#e8eaf0; --k1:#b3122a; --k2:#17181c;
+  --font-head:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-read:"Newsreader",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121316; --panel:#1a1b20; --side:#0e0f12; --ink:#ecece8; --muted:#9a9ca5; --line:#2a2c33;
+    --accent:#e23a4f; --link:#f06277; --ubg:#2b2d36; --utx:#f2f2ef; --soft:#24262d; --code:#0b0c0e; --k1:#e23a4f; --k2:#0e0f12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121316; --panel:#1a1b20; --side:#0e0f12; --ink:#ecece8; --muted:#9a9ca5; --line:#2a2c33;
+  --accent:#e23a4f; --link:#f06277; --ubg:#2b2d36; --utx:#f2f2ef; --soft:#24262d; --code:#0b0c0e; --k1:#e23a4f; --k2:#0e0f12;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* qilim: the woven band is the one decorative element */
+.kilim{flex:none;height:9px;background-color:var(--k2);
+  background-image:
+    linear-gradient(135deg,var(--k1) 25%,transparent 25%),
+    linear-gradient(225deg,var(--k1) 25%,transparent 25%),
+    linear-gradient(315deg,var(--k1) 25%,transparent 25%),
+    linear-gradient(45deg,var(--k1) 25%,transparent 25%);
+  background-size:18px 18px;
+  background-position:-9px 0,-9px 0,0 0,0 0}
+
+.app{flex:1;min-height:0;display:grid;grid-template-columns:276px 1fr}
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;padding:18px 14px 14px}
+.brand{display:flex;align-items:center;gap:11px;padding:0 6px 18px;font-family:var(--font-head);font-weight:700;font-size:25px;letter-spacing:-.03em}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:19px;font-weight:700;letter-spacing:0}
+.new{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 12px;border:0;background:var(--ink);color:var(--bg);border-radius:12px;font-weight:600}
+.new:hover{background:var(--accent);color:var(--accent-ink)}
+.hist{flex:1;overflow-y:auto;margin:18px -4px 0;padding:0 4px;min-height:0}
+.hist-label{font-size:13px;color:var(--muted);padding:6px 10px;font-weight:500}
+.item{display:flex;align-items:center;gap:6px;border-radius:10px;padding:0 4px 0 0;position:relative}
+.item:hover{background:var(--soft)}
+.item.on{background:var(--panel);box-shadow:inset 3px 0 0 var(--accent)}
+.item .t{flex:1;min-width:0;text-align:left;background:none;border:0;padding:9px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.item .x{background:none;border:0;color:var(--muted);padding:4px 8px;border-radius:6px;opacity:0}
+.item:hover .x,.item .x:focus-visible{opacity:1}
+.item .x:hover{color:var(--accent)}
+.side-foot{padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px}
+.ghost{flex:1;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--muted)}
+.ghost:hover{color:var(--ink);border-color:var(--muted)}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.top{display:none;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.top .burger{background:none;border:1px solid var(--line);border-radius:9px;padding:4px 11px;font-size:18px;line-height:1.4}
+.top .name{font-family:var(--font-head);font-weight:700;font-size:20px;letter-spacing:-.02em}
+.banner{margin:12px auto 0;max-width:740px;width:calc(100% - 32px);padding:10px 14px;border:1px solid var(--accent);border-radius:10px;font-size:14px;display:none}
+.scroll{flex:1;overflow-y:auto;min-height:0;padding:32px 20px 8px}
+.col{max-width:740px;margin:0 auto}
+
+.hero{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:28px 0 48px}
+.hero h1{font-family:var(--font-head);font-weight:700;font-size:clamp(42px,8vw,76px);line-height:.98;letter-spacing:-.04em;margin:0 0 18px;max-width:11ch}
+.hero p{color:var(--muted);margin:0 0 34px;max-width:46ch;font-size:17px}
+.chips{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}
+.chip{position:relative;background:none;border:0;border-top:1px solid var(--line);padding:15px 8px 15px 30px;text-align:left;font-size:16.5px;line-height:1.4}
+.chip::before{content:"";position:absolute;left:8px;top:50%;width:8px;height:8px;margin-top:-4px;background:var(--accent);transform:rotate(45deg)}
+.chip:hover{color:var(--link)}
+
+.msg{margin:0 0 28px;display:flex;gap:14px}
+.msg.user{justify-content:flex-end}
+.msg.user .bub{background:var(--ubg);color:var(--utx);padding:11px 17px;border-radius:20px 20px 5px 20px;max-width:82%;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ai .av{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--font-head);font-weight:700;font-size:16px;margin-top:3px}
+.msg.ai .body{min-width:0;flex:1}
+.md{overflow-wrap:anywhere;font-family:var(--font-read);font-size:18px;line-height:1.7}
+.md>*:first-child{margin-top:0}
+.md p{margin:0 0 .9em}
+.md h2,.md h3,.md h4,.md h5{font-family:var(--font-head);line-height:1.2;letter-spacing:-.015em;margin:1.3em 0 .5em}
+.md h2{font-size:1.5em}.md h3{font-size:1.28em}.md h4,.md h5{font-size:1.1em}
+.md ul,.md ol{margin:0 0 .9em;padding-left:1.4em}
+.md li{margin:.25em 0}
+.md li::marker{color:var(--accent)}
+.md blockquote{margin:0 0 .9em;padding:2px 16px;border-left:3px solid var(--accent);color:var(--muted)}
+.md hr{border:0;border-top:1px solid var(--line);margin:1.3em 0}
+.md a{color:var(--link);text-underline-offset:3px}
+.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82em;background:var(--soft);padding:2px 6px;border-radius:5px}
+.md .tw{overflow-x:auto;margin:0 0 .9em}
+.md table{border-collapse:collapse;font-family:var(--font-body);font-size:15px;line-height:1.5}
+.md th,.md td{border:1px solid var(--line);padding:7px 13px;text-align:left}
+.md th{background:var(--soft);font-weight:600}
+.pre{margin:0 0 1em;border-radius:12px;overflow:hidden;background:var(--code);color:var(--code-ink);font-family:var(--font-body)}
+.pre-h{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;font-size:13px;color:#a3a8b5;border-bottom:1px solid #2a2d36}
+.pre-h button{background:none;border:0;color:#a3a8b5;font-size:13px;padding:2px 6px;border-radius:5px}
+.pre-h button:hover{color:#fff}
+.pre pre{margin:0;padding:14px 16px;overflow-x:auto}
+.pre code{background:none;padding:0;color:inherit;font-size:13.5px;line-height:1.6}
+.live::after{content:"";display:inline-block;width:8px;height:8px;background:var(--accent);margin-left:6px;vertical-align:.08em;transform:rotate(45deg);animation:blink 1s steps(2) infinite}
+.think{color:var(--muted)}
+@keyframes blink{50%{opacity:.15}}
+@media (prefers-reduced-motion:reduce){.live::after{animation:none}}
+.acts{display:flex;gap:4px;margin-top:8px;font-family:var(--font-body)}
+.acts button{background:none;border:1px solid transparent;border-radius:8px;padding:3px 10px;font-size:13.5px;color:var(--muted)}
+.acts button:hover{border-color:var(--line);color:var(--ink)}
+.err{color:var(--accent);font-size:14.5px;font-family:var(--font-body)}
+
+.gcard{display:block;border-top:1px solid var(--line);padding:12px 2px;text-decoration:none;color:inherit;font-family:var(--font-body)}
+.gcard:hover strong{text-decoration:underline}
+.gcard .g{display:none}
+.gcard .q{display:block}
+.gcard strong{display:block;color:var(--link);font-size:17px;font-weight:600;line-height:1.35;margin:1px 0 3px}
+.gcard small{display:block;color:var(--muted);font-size:13.5px;line-height:1.45}
+.gcard .q{white-space:normal}
+
+.dock{padding:6px 20px 16px}
+.box{max-width:740px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:12px 12px 10px 18px;box-shadow:0 10px 32px -14px rgba(23,24,28,.28)}
+.box:focus-within{border-color:var(--accent)}
+.box textarea{width:100%;border:0;outline:0;resize:none;background:none;color:inherit;font:inherit;font-size:16.5px;max-height:200px;padding:4px 0;line-height:1.5}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--bg)}
+.seg button{border:0;background:none;padding:5px 15px;border-radius:999px;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.send{width:38px;height:38px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:18px;line-height:1}
+.send:disabled{opacity:.3;cursor:default}
+.send.stop{background:var(--ink);color:var(--bg)}
+.foot{max-width:740px;margin:9px auto 0;text-align:center;font-size:12.5px;color:var(--muted)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:50;padding:16px}
+.modal[hidden]{display:none}
+.scrim{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;z-index:20;top:0;bottom:0;left:0;width:284px;padding-top:calc(18px + env(safe-area-inset-top,0px));transform:translateX(-100%);transition:transform .2s}
+  .app.open .side{transform:none}
+  .app.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10}
+  .top{display:flex}
+  .item .x{opacity:1}
+  .md{font-size:17px}
+  .scroll{padding:22px 16px 8px}
+  .dock{padding:6px 12px 12px}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+
+/* ---- v3 polish ---- */
+::selection{background:var(--accent);color:#fff}
+.main{background:radial-gradient(900px 420px at 88% -8%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 70%),var(--bg)}
+.scroll{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.hist{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.mark{box-shadow:0 6px 14px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+.mark svg{display:block}
+.brand{font-size:27px}
+.new{box-shadow:0 8px 18px -10px rgba(23,24,28,.5);transition:background .15s,transform .1s}
+.new:active{transform:scale(.98)}
+.item .t{transition:padding .15s}
+.item:hover .t{padding-left:15px}
+.hero{position:relative}
+.hero h1{font-size:clamp(46px,8.4vw,84px);max-width:9.5ch}
+.rosette{position:absolute;right:0;top:34px;width:216px;height:216px;filter:drop-shadow(0 22px 26px rgba(23,24,28,.22))}
+.chip{transition:padding .15s,color .15s}
+.chip:hover{padding-left:38px}
+.chip:hover::before{transform:rotate(45deg) scale(1.35)}
+.chip::before{transition:transform .15s}
+.msg.ai .av{box-shadow:0 5px 12px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+.msg.ai .av svg{display:block}
+.msg.user .bub{box-shadow:0 8px 18px -12px rgba(23,24,28,.6)}
+.dock{position:relative}
+.dock::before{content:"";position:absolute;left:0;right:0;top:-30px;height:30px;background:linear-gradient(to top,var(--bg),transparent);pointer-events:none}
+.box{transition:border-color .15s,box-shadow .2s}
+.box:focus-within{box-shadow:0 14px 40px -14px color-mix(in srgb,var(--accent) 45%,transparent)}
+.seg{box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.seg button{transition:background .15s,color .15s}
+.seg button[aria-pressed="true"]{box-shadow:0 3px 8px -3px rgba(0,0,0,.4)}
+.send{transition:transform .1s,background .15s;box-shadow:0 8px 16px -8px color-mix(in srgb,var(--accent) 80%,transparent)}
+.send:not(:disabled):hover{transform:scale(1.06)}
+.send:not(:disabled):active{transform:scale(.95)}
+.live::after{width:7px;height:7px;margin-left:10px;margin-right:26px;box-shadow:14px 0 var(--accent),28px 0 var(--accent)}
+.gcard{border-radius:0;transition:background .15s}
+.gcard:hover{background:color-mix(in srgb,var(--soft) 55%,transparent)}
+@media (max-width:820px){
+  .rosette{position:static;width:64px;height:64px;margin-bottom:20px;filter:none}
+  .hero h1{font-size:clamp(42px,13vw,64px)}
+  .chip:hover{padding-left:30px}
+}
+@media (prefers-reduced-motion:reduce){.chip,.chip::before,.new,.send,.item .t{transition:none}}
+
+/* ---- credit ---- */
+.brand{font-size:23px;white-space:nowrap}
+.credit{margin-top:12px;font-size:12.5px;color:var(--muted);text-align:center}
+.credit strong{color:var(--ink);font-weight:600}
+.hero .credit-hero{margin:24px 0 0;font-size:13.5px;color:var(--muted)}
+.credit-hero strong{color:var(--ink);font-weight:600}
+.top .name{font-size:19px}
+
+/* ---- login ---- */
+.acct{padding:12px 2px 12px}
+.acct .login-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--accent);background:none;color:var(--accent);border-radius:12px;font-weight:600;font-size:14.5px;transition:background .15s,color .15s}
+.acct .login-btn:hover{background:var(--accent);color:var(--accent-ink)}
+.acct .who{display:flex;align-items:center;gap:10px;padding:2px 4px}
+.acct .pic{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--font-head);font-weight:700;font-size:16px;overflow:hidden}
+.acct .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.acct .nm{flex:1;min-width:0;line-height:1.25}
+.acct .nm b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acct .nm small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acct .out{background:none;border:1px solid var(--line);border-radius:9px;padding:5px 11px;font-size:13px;color:var(--muted)}
+.acct .out:hover{color:var(--accent);border-color:var(--accent)}
+.auth-card{position:relative;width:100%;max-width:430px;max-height:100%;overflow-y:auto;background:var(--panel);color:var(--ink);border-radius:18px;padding:30px 28px 22px;box-shadow:0 30px 70px -20px rgba(0,0,0,.55)}
+.auth-x{position:absolute;top:12px;right:12px;background:none;border:0;color:var(--muted);font-size:17px;padding:6px 9px;border-radius:8px;line-height:1}
+.auth-x:hover{color:var(--ink);background:var(--soft)}
+.auth-brand{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font-head);font-weight:700;font-size:22px;letter-spacing:-.02em;margin-bottom:6px}
+.auth-brand .mark{width:30px;height:30px}
+.auth-sub{text-align:center;color:var(--muted);margin:0 0 20px;font-size:16px}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border:1px solid var(--line);background:var(--panel);border-radius:10px;font-size:15.5px;color:var(--ink);transition:background .15s}
+.gbtn:hover{background:var(--soft)}
+.or{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:14px;margin:18px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.fld{position:relative;margin-bottom:14px}
+.fld input[type=text],.fld input[type=email],.fld input[type=password]{width:100%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:16px;padding:14px 15px;border-radius:10px;outline:0}
+.fld input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.fld.pw input{padding-right:46px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);padding:8px 10px;font-size:13px;border-radius:8px}
+.eye:hover{color:var(--ink)}
+.arow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 16px;font-size:14.5px}
+.arow label{display:flex;align-items:center;gap:8px;color:var(--muted);cursor:pointer}
+.arow input{width:17px;height:17px;accent-color:var(--accent)}
+.alink{background:none;border:0;padding:0;color:var(--accent);font-weight:600;font-size:inherit}
+.alink:hover{text-decoration:underline}
+.abtn{width:100%;padding:14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;transition:filter .15s}
+.abtn:hover{filter:brightness(1.08)}
+.abtn:disabled{opacity:.55;cursor:default}
+.amsg{font-size:14px;line-height:1.45;margin:0 0 12px;padding:9px 12px;border-radius:9px}
+.amsg.e{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.amsg.k{color:#1d7a46;background:rgba(29,122,70,.12)}
+.aswitch{text-align:center;color:var(--muted);margin:18px 0 6px;font-size:15px}
+.aguest{text-align:center;color:var(--muted);font-size:13px;margin:0}
+.auth-card [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="kilim" aria-hidden="true"></div>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Bisedat">
+    <div class="brand"><span class="mark"><svg viewBox="-10 -10 20 20" width="19" height="19" aria-hidden="true"><rect x="-6.6" y="-6.6" width="13.2" height="13.2" transform="rotate(45)" fill="#fff"/><rect x="-4" y="-4" width="8" height="8" transform="rotate(45)" fill="var(--accent)"/><rect x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(45)" fill="#fff"/></svg></span>Dija Shqiptare</div>
+    <button class="new" id="newBtn">＋ Bisedë e re</button>
+    <div class="hist" id="hist"></div>
+    <div class="acct" id="acct"></div>
+    <div class="side-foot">
+      <button class="ghost" id="themeBtn">Tema</button>
+      <button class="ghost" id="clearBtn">Fshi gjithçka</button>
+    </div>
+  <div class="credit">Krijuar nga <strong>Drilon Avdyli</strong></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <section class="main">
+    <div class="top">
+      <button class="burger" id="burger" aria-label="Hap menynë">☰</button>
+      <span class="name">Dija Shqiptare</span>
+    </div>
+    <div class="scroll" id="scroll"><div class="col" id="col"></div></div>
+    <div class="dock">
+      <div class="box">
+        <textarea id="inp" rows="1" placeholder="Pyet çfarëdo gjëje…" aria-label="Mesazhi"></textarea>
+        <div class="row">
+          <div class="seg" role="group" aria-label="Mënyra">
+            <button id="mAi" aria-pressed="true">Dija AI</button>
+            <button id="mGo" aria-pressed="false">Google</button>
+          </div>
+          <button class="send" id="send" aria-label="Dërgo" disabled>↑</button>
+        </div>
+      </div>
+      <div class="foot" id="foot">Dija mund të gabojë. Për lajme dhe të dhëna të fundit, kontrollo në Google.</div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="authModal" hidden role="dialog" aria-modal="true" aria-labelledby="authBrand">
+  <div class="auth-card">
+    <button class="auth-x" id="authX" type="button" aria-label="Mbyll">✕</button>
+    <div class="auth-brand" id="authBrand"><span class="mark"><svg viewBox="-10 -10 20 20" width="17" height="17" aria-hidden="true"><rect x="-6.6" y="-6.6" width="13.2" height="13.2" transform="rotate(45)" fill="#fff"/><rect x="-4" y="-4" width="8" height="8" transform="rotate(45)" fill="var(--accent)"/><rect x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(45)" fill="#fff"/></svg></span>Dija Shqiptare</div>
+    <p class="auth-sub" id="authSub">Hyni në llogarinë tuaj</p>
+    <div data-m="login register">
+      <button class="gbtn" id="gBtn" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.100 0 24s.9 7.600 2.600 10.800l7.900-6.100z"/><path fill="#34A853" d="M24 48c6.5 0 11.900-2.100 15.900-5.800l-7.500-5.800c-2.100 1.400-4.800 2.300-8.400 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48z"/></svg><span>Identifikohu me Google (Gmail)</span></button>
+      <div class="or"><span>Ose</span></div>
+    </div>
+    <form id="authForm" novalidate>
+      <div class="fld" data-m="register"><input type="text" id="aName" placeholder="Emri" autocomplete="name"></div>
+      <div class="fld"><input type="email" id="aEmail" placeholder="Adresa e emailit" autocomplete="email" inputmode="email"></div>
+      <div class="fld pw" data-m="login register"><input type="password" id="aPass" placeholder="Fjalëkalimi" autocomplete="current-password"><button class="eye" id="aEye" type="button" aria-label="Shfaq fjalëkalimin">Shfaq</button></div>
+      <div class="arow" data-m="login">
+        <label><input type="checkbox" id="aRem" checked>Më mbaj të kyçur</label>
+        <button class="alink" id="aForgot" type="button">Keni harruar fjalëkalimin?</button>
+      </div>
+      <div class="amsg e" id="aErr" hidden></div>
+      <div class="amsg k" id="aOk" hidden></div>
+      <button class="abtn" id="aSubmit" type="submit">Kyçuni</button>
+    </form>
+    <p class="aswitch" data-m="login">Nuk keni një llogari? <button class="alink" id="aToReg" type="button">Regjistrohu</button></p>
+    <p class="aswitch" data-m="register">Keni tashmë llogari? <button class="alink" id="aToLogin" type="button">Kyçuni</button></p>
+    <p class="aswitch" data-m="reset"><button class="alink" id="aBack" type="button">← Kthehu te kyçja</button></p>
+    <p class="aguest" id="aGuest">Mund të pyesësh edhe pa llogari.</p>
+  </div>
+</div>
+
+<script>
+/* ====== KONFIGURIMI I LOGIN-IT ======
+   Ngjit këtu "firebaseConfig" nga Firebase Console (Project settings → Your apps → Web).
+   Në Authentication → Sign-in method aktivizo "Email/Password" dhe "Google".
+   Në Authentication → Settings → Authorized domains shto domenin e Netlify (emri.netlify.app). */
+window.DIJA_FIREBASE = {
+  apiKey: "AIzaSyB_AU45n3XAU_m7ka9XzdHyqcCHBPHZCR8",
+  authDomain: "claude-35cc5.firebaseapp.com",
+  projectId: "claude-35cc5",
+  storageBucket: "claude-35cc5.firebasestorage.app",
+  messagingSenderId: "531782736028",
+  appId: "1:531782736028:web:06ae017f41d5f4f0393559",
+  measurementId: "G-GTCKGJ59KQ"
+};
+/* true = pa llogari nuk hapet chat-i; false = login është opsional */
+window.DIJA_REQUIRE_LOGIN = false;
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+(function(){
+  var RULES = "Ti je Dija Shqiptare, një asistent i dobishëm, i qartë dhe i sinqertë, si ChatGPT. Përgjigju gjithmonë në gjuhën që përdor personi (si parazgjedhje shqip). Përdor formatim Markdown kur ndihmon (tituj të shkurtër, lista, tabela, blloqe kodi). Jep përgjigje të drejtpërdrejta dhe të sakta. Nuk ke akses në internet: për lajme, çmime, rezultate ose çdo gjë të fundit, thuaji personit që të përdorë butonin Google. Mos shpik burime ose lidhje. Nëse të pyesin kush e ka krijuar këtë faqe, thuaj se Dija Shqiptare është krijuar nga Drilon Avdyli.";
+  var KEY = "dija:chats:v1";
+  var user = null, auth = null, fbOK = false, pendingCtx = "", chats = [], curId = null, mode = "ai", busy = false, ctl = null, sample = null;
+
+  var MARK='<svg viewBox="-10 -10 20 20" width="19" height="19" aria-hidden="true"><rect x="-6.6" y="-6.6" width="13.2" height="13.2" transform="rotate(45)" fill="#fff"/><rect x="-4" y="-4" width="8" height="8" transform="rotate(45)" fill="var(--accent)"/><rect x="-1.7" y="-1.7" width="3.4" height="3.4" transform="rotate(45)" fill="#fff"/></svg>';
+  var ROSETTE='<svg class="rosette" viewBox="-100 -100 200 200" aria-hidden="true"><rect x="-90" y="-90" width="180" height="180" style="fill:var(--k1)"/><rect x="-63.6" y="-63.6" width="127.3" height="127.3" transform="rotate(45)" style="fill:var(--k2)"/><rect x="-45" y="-45" width="90" height="90" style="fill:#d9a441"/><rect x="-31.8" y="-31.8" width="63.6" height="63.6" transform="rotate(45)" style="fill:var(--k1)"/><rect x="-22.5" y="-22.5" width="45" height="45" style="fill:var(--panel)"/><rect x="-11" y="-11" width="22" height="22" transform="rotate(45)" style="fill:var(--k2)"/></svg>';
+  var $ = function(id){ return document.getElementById(id); };
+  var col=$("col"), scroll=$("scroll"), inp=$("inp"), sendBtn=$("send"), hist=$("hist"), app=$("app");
+
+  // ---------- storage ----------
+  function key(){ return KEY + (user ? ":" + user.uid : ""); }
+  function load(){
+    try{ var raw = localStorage.getItem(key()); if(raw){ var d = JSON.parse(raw); chats = d.chats||[]; curId = d.cur||null; } }catch(e){}
+  }
+  function save(){
+    try{ localStorage.setItem(key(), JSON.stringify({chats:chats.slice(0,60), cur:curId})); }catch(e){}
+  }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function cur(){ return chats.find(function(c){return c.id===curId;}) || null; }
+
+  // ---------- markdown ----------
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function inline(s){
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g,"<code>$1</code>");
+    s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+    s = s.replace(/(^|[^*\w])\*([^*\s][^*]*)\*/g,"$1<em>$2</em>");
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return s;
+  }
+  function cells(l){ return l.trim().replace(/^\||\|$/g,"").split("|").map(function(c){return c.trim();}); }
+  var SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+  function isBlockStart(l, nx){
+    return /^(#{1,4})\s+/.test(l)||/^\s*[-*]\s+/.test(l)||/^\s*\d+[.)]\s+/.test(l)||/^>\s?/.test(l)||/^---+\s*$/.test(l)||(l.indexOf("|")>=0 && nx!==undefined && SEP.test(nx));
+  }
+  function textBlocks(text){
+    var lines = text.split("\n"), i=0, out=[], m;
+    while(i<lines.length){
+      var l = lines[i];
+      if(!l.trim()){ i++; continue; }
+      if((m = l.match(/^(#{1,4})\s+(.*)/))){ out.push("<h"+(m[1].length+1)+">"+inline(m[2])+"</h"+(m[1].length+1)+">"); i++; continue; }
+      if(/^---+\s*$/.test(l)){ out.push("<hr>"); i++; continue; }
+      if(l.indexOf("|")>=0 && i+1<lines.length && SEP.test(lines[i+1])){
+        var head = cells(l), rows=[]; i+=2;
+        while(i<lines.length && lines[i].indexOf("|")>=0 && lines[i].trim()){ rows.push(cells(lines[i])); i++; }
+        out.push('<div class="tw"><table><thead><tr>'+head.map(function(h){return "<th>"+inline(h)+"</th>";}).join("")+"</tr></thead><tbody>"+
+          rows.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+inline(c)+"</td>";}).join("")+"</tr>";}).join("")+"</tbody></table></div>");
+        continue;
+      }
+      if(/^\s*[-*]\s+/.test(l)){
+        var li=[]; while(i<lines.length && /^\s*[-*]\s+/.test(lines[i])){ li.push("<li>"+inline(lines[i].replace(/^\s*[-*]\s+/,""))+"</li>"); i++; }
+        out.push("<ul>"+li.join("")+"</ul>"); continue;
+      }
+      if(/^\s*\d+[.)]\s+/.test(l)){
+        var lo=[]; while(i<lines.length && /^\s*\d+[.)]\s+/.test(lines[i])){ lo.push("<li>"+inline(lines[i].replace(/^\s*\d+[.)]\s+/,""))+"</li>"); i++; }
+        out.push("<ol>"+lo.join("")+"</ol>"); continue;
+      }
+      if(/^>\s?/.test(l)){
+        var q=[]; while(i<lines.length && /^>\s?/.test(lines[i])){ q.push(inline(lines[i].replace(/^>\s?/,""))); i++; }
+        out.push("<blockquote>"+q.join("<br>")+"</blockquote>"); continue;
+      }
+      var p=[]; while(i<lines.length && lines[i].trim() && !isBlockStart(lines[i], lines[i+1])){ p.push(inline(lines[i])); i++; }
+      if(!p.length){ p.push(inline(l)); i++; }
+      out.push("<p>"+p.join("<br>")+"</p>");
+    }
+    return out.join("");
+  }
+  function md(src){
+    var parts = src.split("```"), html="";
+    for(var k=0;k<parts.length;k++){
+      if(k%2===0){ html += textBlocks(parts[k]); }
+      else{
+        var nl = parts[k].indexOf("\n"), lang = "", code = parts[k];
+        if(nl>=0){ lang = parts[k].slice(0,nl).trim(); code = parts[k].slice(nl+1); }
+        html += '<div class="pre"><div class="pre-h"><span>'+esc(lang||"kod")+'</span><button data-copy="code">Kopjo</button></div><pre><code>'+esc(code.replace(/\n$/,""))+"</code></pre></div>";
+      }
+    }
+    return html;
+  }
+
+  // ---------- rendering ----------
+  function googleUrl(q){ return "https://www.google.com/search?q="+encodeURIComponent(q); }
+  var SUGGEST = [
+    "Shpjegomë si funksionon fotosinteza me fjalë të thjeshta",
+    "Më ndihmo të shkruaj një email profesional për një aplikim pune",
+    "Cili është ndryshimi mes React dhe Vue?",
+    "Bëj një plan udhëtimi 3-ditor për Shkodrën"
+  ];
+  function el(tag, cls, html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+
+  function renderHist(){
+    hist.innerHTML = "";
+    if(!chats.length){ return; }
+    hist.appendChild(el("div","hist-label","Bisedat e fundit"));
+    chats.forEach(function(c){
+      var it = el("div","item"+(c.id===curId?" on":""));
+      var t = el("button","t"); t.textContent = c.title; t.onclick=function(){ if(busy) return; curId=c.id; save(); render(); app.classList.remove("open"); };
+      var x = el("button","x"); x.textContent="✕"; x.setAttribute("aria-label","Fshi bisedën"); x.onclick=function(){ if(busy) return; chats=chats.filter(function(k){return k.id!==c.id;}); if(curId===c.id) curId=null; save(); render(); };
+      it.appendChild(t); it.appendChild(x); hist.appendChild(it);
+    });
+  }
+
+  function msgNode(m, idx, isLast){
+    if(m.role==="user"){
+      var u = el("div","msg user"); var b = el("div","bub"); b.textContent=m.content; u.appendChild(b); return u;
+    }
+    if(m.role==="search" && (m.pending || (m.results && m.results.length))){
+      var box = el("div","msg ai"); box.appendChild(el("div","av","G"));
+      var bd = el("div","body");
+      if(m.pending){ var pe = el("div","md think live"); pe.textContent = "Po kërkoj në Google"; bd.appendChild(pe); }
+      else{
+        var h = el("div","hist-label"); h.textContent = "Rezultatet nga Google për: "+m.content; h.style.paddingLeft="0"; bd.appendChild(h);
+        m.results.forEach(function(it){
+          var a = el("a","gcard"); a.href = it.link; a.target="_blank"; a.rel="noopener noreferrer";
+          var q = el("span","q"); var sm = el("small"); sm.textContent = it.displayLink || it.link; q.appendChild(sm);
+          var tt = document.createElement("strong"); tt.textContent = it.title; q.appendChild(tt);
+          q.style.whiteSpace="normal"; var sn = el("small"); sn.textContent = it.snippet || ""; q.appendChild(sn);
+          a.appendChild(q); bd.appendChild(a);
+        });
+        var acts = el("div","acts");
+        var ai = el("button"); ai.textContent = "Përmblidh me AI";
+        ai.onclick = function(){
+          if(busy) return;
+          pendingCtx = "Rezultatet e kërkimit në Google:\n" + m.results.map(function(r,i){ return (i+1)+". "+r.title+" - "+(r.snippet||"")+" ("+r.link+")"; }).join("\n");
+          setMode("ai"); inp.value = "Përmblidh këto rezultate për: "+m.content; send();
+        };
+        var go = el("button"); go.textContent = "Hap në Google"; go.onclick = function(){ window.open(googleUrl(m.content),"_blank","noopener"); };
+        acts.appendChild(ai); acts.appendChild(go); bd.appendChild(acts);
+      }
+      box.appendChild(bd); return box;
+    }
+    if(m.role==="search"){
+      var a = el("a","gcard"); a.href=googleUrl(m.content); a.target="_blank"; a.rel="noopener noreferrer";
+      a.innerHTML = '<span class="g">G</span><span class="q"><small>U hap në Google</small></span>';
+      a.querySelector(".q").appendChild(document.createTextNode(m.content));
+      return a;
+    }
+    var w = el("div","msg ai");
+    w.appendChild(el("div","av",MARK));
+    var body = el("div","body");
+    var c = el("div","md"); c.id = "ai-"+idx;
+    if(m.error){ c.innerHTML = md(m.content||"") ; var er = el("div","err"); er.textContent = m.error; body.appendChild(c); body.appendChild(er); }
+    else if(!m.content){ c.className="md think live"; c.textContent="Po mendoj"; body.appendChild(c); }
+    else { c.innerHTML = md(m.content); body.appendChild(c); }
+    if(m.content && !(busy && isLast)){
+      var acts = el("div","acts");
+      var cp = el("button"); cp.textContent="Kopjo"; cp.onclick=function(){ copyText(m.content, cp); };
+      var q = lastUserBefore(idx);
+      var gg = el("button"); gg.textContent="Kërko në Google"; gg.onclick=function(){ window.open(googleUrl(q||m.content.slice(0,120)),"_blank","noopener"); };
+      acts.appendChild(cp); acts.appendChild(gg); body.appendChild(acts);
+    }
+    w.appendChild(body); return w;
+  }
+  function lastUserBefore(idx){
+    var c = cur(); if(!c) return "";
+    for(var i=idx-1;i>=0;i--){ if(c.messages[i].role==="user") return c.messages[i].content; }
+    return "";
+  }
+  function copyText(t, btn){
+    var done=function(){ var o=btn.textContent; btn.textContent="U kopjua"; setTimeout(function(){btn.textContent=o;},1400); };
+    try{ navigator.clipboard.writeText(t).then(done,function(){}); }catch(e){}
+  }
+  col.addEventListener("click", function(e){
+    var b = e.target.closest("[data-copy]"); if(!b) return;
+    var code = b.closest(".pre").querySelector("code").textContent; copyText(code,b);
+  });
+
+  function renderMain(){
+    col.innerHTML="";
+    var c = cur();
+    if(!c || !c.messages.length){
+      var h = el("div","hero"); h.insertAdjacentHTML("afterbegin", ROSETTE);
+      h.appendChild(el("h1","","Çfarë do të dish sot?"));
+      h.appendChild(el("p","","Pyet për shpjegime, shkrim, kod ose përkthime. Për lajme të fundit kalo te Google."));
+      var g = el("div","chips");
+      SUGGEST.forEach(function(s){ var b=el("button","chip"); b.textContent=s; b.onclick=function(){ setMode("ai"); inp.value=s; send(); }; g.appendChild(b); });
+      h.appendChild(g); h.appendChild(el("p","credit-hero","Dija Shqiptare, krijuar nga <strong>Drilon Avdyli</strong>")); col.appendChild(h); return;
+    }
+    c.messages.forEach(function(m,i){ col.appendChild(msgNode(m,i,i===c.messages.length-1)); });
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+  function render(){ renderHist(); renderMain(); updateSend(); }
+
+  // ---------- mode & input ----------
+  function setMode(m){
+    mode=m;
+    $("mAi").setAttribute("aria-pressed", m==="ai");
+    $("mGo").setAttribute("aria-pressed", m==="go");
+    inp.placeholder = m==="ai" ? "Pyet çfarëdo gjëje…" : "Kërko në Google…";
+    $("foot").textContent = m==="ai" ? "Dija mund të gabojë. Për lajme dhe të dhëna të fundit, kontrollo në Google." : "Enter kërkon në Google dhe shfaq rezultatet këtu.";
+    inp.focus();
+  }
+  $("mAi").onclick=function(){ setMode("ai"); };
+  $("mGo").onclick=function(){ setMode("go"); };
+  function updateSend(){
+    if(busy){ sendBtn.disabled=false; sendBtn.classList.add("stop"); sendBtn.textContent="■"; sendBtn.setAttribute("aria-label","Ndalo"); }
+    else{ sendBtn.classList.remove("stop"); sendBtn.textContent="↑"; sendBtn.setAttribute("aria-label","Dërgo"); sendBtn.disabled = !inp.value.trim(); }
+  }
+  function autosize(){ inp.style.height="auto"; inp.style.height=Math.min(inp.scrollHeight,200)+"px"; }
+  inp.addEventListener("input", function(){ autosize(); updateSend(); });
+  inp.addEventListener("keydown", function(e){ if(e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); if(!busy) send(); } });
+  sendBtn.onclick=function(){ if(busy){ if(ctl) ctl.abort(); } else send(); };
+
+  // ---------- sending ----------
+  function ensureChat(first){
+    var c = cur();
+    if(!c){ c = {id:uid(), title:first.slice(0,44)||"Bisedë e re", messages:[]}; chats.unshift(c); curId=c.id; }
+    return c;
+  }
+  function buildInput(c){
+    var turns=[];
+    c.messages.forEach(function(m){
+      if((m.role!=="user" && m.role!=="assistant") || !m.content) return;
+      var last = turns[turns.length-1];
+      if(last && last.role===m.role){ last.content += "\n\n"+m.content + (m.ctx ? "\n\n"+m.ctx : ""); } else turns.push({role:m.role, content:m.content + (m.ctx ? "\n\n"+m.ctx : "")});
+    });
+    turns = turns.slice(-14);
+    while(turns.length && turns[0].role!=="user") turns.shift();
+    return turns;
+  }
+  var ERR = {
+    not_granted:"Nuk ke lejuar përdorimin e Claude për këtë faqe. Rihap faqen dhe lejoje kur të kërkohet.",
+    sampling_disabled:"AI nuk është i disponueshëm për këtë llogari.",
+    rate_limited:"Shumë kërkesa ose arrite kufirin e përdorimit. Provo përsëri pas pak.",
+    session_expired:"Sesioni skadoi. Hyr përsëri në Claude.",
+    refused:"Kjo kërkesë u refuzua. Provo ta formulosh ndryshe.",
+    empty_completion:"Nuk erdhi asnjë përgjigje. Provo ta riformulosh pyetjen.",
+    server:"Serveri nuk është konfiguruar (mungon çelësi API në Vercel).",
+    network:"Nuk u lidh me Anthropic. Kontrollo internetin.",
+    prompt_too_large:"Biseda është shumë e gjatë. Hap një bisedë të re."
+  };
+
+  async function send(){
+    var text = inp.value.trim(); if(!text || busy) return;
+    inp.value=""; autosize();
+    var c = ensureChat(text);
+    if(mode==="go"){
+      var sm = {role:"search", content:text, pending:true};
+      c.messages.push(sm); save(); render();
+      try{
+        var r = await fetch("/api/search?q="+encodeURIComponent(text));
+        if(!r.ok) throw new Error("no search");
+        var d = await r.json(); sm.results = d.items || [];
+      }catch(e){ window.open(googleUrl(text),"_blank","noopener"); }
+      delete sm.pending; save(); render(); return;
+    }
+    if(false){ c.messages.push({role:"user",content:text}); c.messages.push({role:"assistant",content:"",error:"AI nuk është i disponueshëm këtu. Përdor mënyrën Google."}); save(); render(); return; }
+    c.messages.push({role:"user",content:text, ctx:pendingCtx}); pendingCtx="";
+    var a = {role:"assistant", content:""};
+    c.messages.push(a);
+    busy=true; save(); render();
+    var node = function(){ return document.getElementById("ai-"+(c.messages.length-1)); };
+    var raf = 0;
+    function paint(){ raf=0; var n=node(); if(!n) return; n.className="md live"; n.innerHTML=md(a.content); if(nearBottom()) scroll.scrollTop=scroll.scrollHeight; }
+    function nearBottom(){ return scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 140; }
+    ctl = new AbortController();
+    var input = buildInput({messages:c.messages.slice(0,-1)});
+    try{
+      var res = await sample(input, {
+        cache:false, signal:ctl.signal, modelTier:"default",
+        onText:function(o){ a.content=o.text; if(!raf) raf=requestAnimationFrame(paint); }
+      });
+      a.content = res.text;
+      if(res.truncated) a.error = "Përgjigja u shkurtua. Kërko vazhdimin.";
+    }catch(e){
+      var code = e && e.code;
+      if(e && e.text) a.content = e.text;
+      if(code!=="cancelled"){ a.error = (ERR[code] || "Ndodhi një gabim gjatë përgjigjes.") + (e && e.detail ? " ["+e.detail+"]" : ""); }
+      if(!a.content && code==="cancelled"){ c.messages.pop(); }
+    }finally{
+      if(raf) cancelAnimationFrame(raf);
+      busy=false; ctl=null; save(); render(); inp.focus();
+    }
+  }
+
+  // ---------- chrome ----------
+  $("newBtn").onclick=function(){ if(busy) return; curId=null; save(); render(); app.classList.remove("open"); inp.focus(); };
+  $("clearBtn").onclick=function(){ if(busy) return; if(chats.length && confirm("Të fshihen të gjitha bisedat?")){ chats=[]; curId=null; save(); render(); } };
+  $("burger").onclick=function(){ app.classList.add("open"); };
+  $("scrim").onclick=function(){ app.classList.remove("open"); };
+  $("themeBtn").onclick=function(){
+    var r=document.documentElement, dark = r.getAttribute("data-theme")==="dark" || (!r.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    r.setAttribute("data-theme", dark?"light":"dark");
+    try{ localStorage.setItem("dija:theme", dark?"light":"dark"); }catch(e){}
+  };
+  try{ var th=localStorage.getItem("dija:theme"); if(th) document.documentElement.setAttribute("data-theme",th); }catch(e){}
+
+
+  // ---------- login (Firebase Auth) ----------
+  var AERR = {
+    "auth/invalid-email":"Adresa e emailit nuk është e vlefshme.",
+    "auth/missing-email":"Shkruaj adresën e emailit.",
+    "auth/missing-password":"Shkruaj fjalëkalimin.",
+    "auth/invalid-credential":"Emaili ose fjalëkalimi është i gabuar.",
+    "auth/wrong-password":"Emaili ose fjalëkalimi është i gabuar.",
+    "auth/user-not-found":"Emaili ose fjalëkalimi është i gabuar.",
+    "auth/invalid-login-credentials":"Emaili ose fjalëkalimi është i gabuar.",
+    "auth/email-already-in-use":"Ky email është përdorur tashmë. Provo të kyçesh.",
+    "auth/weak-password":"Fjalëkalimi duhet të ketë të paktën 6 karaktere.",
+    "auth/too-many-requests":"Shumë tentativa. Provo përsëri pas pak.",
+    "auth/network-request-failed":"Nuk u lidh me serverin. Kontrollo internetin.",
+    "auth/popup-closed-by-user":"",
+    "auth/cancelled-popup-request":"",
+    "auth/unauthorized-domain":"Ky domen nuk është i autorizuar në Firebase (Authentication → Settings → Authorized domains).",
+    "auth/operation-not-allowed":"Kjo mënyrë kyçjeje nuk është aktivizuar në Firebase."
+  };
+  var aMode = "login";
+  var authModal = $("authModal");
+  function showMsg(id, t){ var n=$(id); n.textContent=t||""; n.hidden=!t; }
+  function setAuthMode(m){
+    aMode = m;
+    showMsg("aErr",""); showMsg("aOk","");
+    Array.prototype.forEach.call(authModal.querySelectorAll("[data-m]"), function(n){ n.hidden = n.getAttribute("data-m").split(" ").indexOf(m)<0; });
+    $("authSub").textContent = m==="login" ? "Hyni në llogarinë tuaj" : m==="register" ? "Krijo llogari të re" : "Do të të dërgojmë një lidhje për ta ndryshuar fjalëkalimin";
+    $("aSubmit").textContent = m==="login" ? "Kyçuni" : m==="register" ? "Regjistrohu" : "Dërgo lidhjen";
+    $("aPass").setAttribute("autocomplete", m==="register" ? "new-password" : "current-password");
+  }
+  function lockedOut(){ return window.DIJA_REQUIRE_LOGIN && !user; }
+  function openAuth(m){
+    setAuthMode(m||"login");
+    $("authX").hidden = lockedOut(); $("aGuest").hidden = lockedOut();
+    if(!fbOK) showMsg("aErr","Login-i nuk është konfiguruar ende: shto çelësat e Firebase te DIJA_FIREBASE në index.html.");
+    authModal.hidden = false; app.classList.remove("open");
+    setTimeout(function(){ $("aEmail").focus(); }, 30);
+  }
+  function closeAuth(){ if(lockedOut()) return; authModal.hidden = true; }
+  function busyBtn(b){ $("aSubmit").disabled = b; $("gBtn").disabled = b; }
+  function fail(e){ showMsg("aErr", (AERR[e && e.code] !== undefined) ? AERR[e.code] : "Ndodhi një gabim. Provo përsëri."); }
+
+  $("authX").onclick = closeAuth;
+  authModal.addEventListener("mousedown", function(e){ if(e.target===authModal) closeAuth(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !authModal.hidden) closeAuth(); });
+  $("aToReg").onclick = function(){ setAuthMode("register"); };
+  $("aToLogin").onclick = function(){ setAuthMode("login"); };
+  $("aForgot").onclick = function(){ setAuthMode("reset"); };
+  $("aBack").onclick = function(){ setAuthMode("login"); };
+  $("aEye").onclick = function(){
+    var p=$("aPass"), show = p.type==="password"; p.type = show ? "text" : "password";
+    $("aEye").textContent = show ? "Fshih" : "Shfaq";
+  };
+
+  $("authForm").addEventListener("submit", async function(ev){
+    ev.preventDefault(); showMsg("aErr",""); showMsg("aOk","");
+    if(!fbOK){ showMsg("aErr","Login-i nuk është konfiguruar ende: shto çelësat e Firebase te DIJA_FIREBASE në index.html."); return; }
+    var email = $("aEmail").value.trim(), pass = $("aPass").value;
+    if(!email){ showMsg("aErr", AERR["auth/missing-email"]); return; }
+    if(aMode!=="reset" && !pass){ showMsg("aErr", AERR["auth/missing-password"]); return; }
+    busyBtn(true);
+    try{
+      if(aMode==="reset"){
+        await auth.sendPasswordResetEmail(email);
+        showMsg("aOk","Lidhja u dërgua. Kontrollo email-in (edhe te Spam).");
+      }else if(aMode==="register"){
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        var cr = await auth.createUserWithEmailAndPassword(email, pass);
+        var nm = $("aName").value.trim();
+        if(nm){ try{ await cr.user.updateProfile({displayName:nm}); }catch(e){} }
+        user = auth.currentUser; updateAcct();
+      }else{
+        await auth.setPersistence($("aRem").checked ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
+        await auth.signInWithEmailAndPassword(email, pass);
+      }
+    }catch(e){ fail(e); }
+    busyBtn(false);
+  });
+
+  $("gBtn").onclick = async function(){
+    showMsg("aErr","");
+    if(!fbOK){ showMsg("aErr","Login-i nuk është konfiguruar ende: shto çelësat e Firebase te DIJA_FIREBASE në index.html."); return; }
+    var prov = new firebase.auth.GoogleAuthProvider();
+    busyBtn(true);
+    try{
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      await auth.signInWithPopup(prov);
+    }catch(e){
+      if(e && (e.code==="auth/popup-blocked" || e.code==="auth/operation-not-supported-in-this-environment")){
+        try{ await auth.signInWithRedirect(prov); return; }catch(e2){ fail(e2); }
+      }else fail(e);
+    }
+    busyBtn(false);
+  };
+
+  function updateAcct(){
+    var box = $("acct"); box.innerHTML = "";
+    if(!user){
+      var b = el("button","login-btn","Kyçu / Regjistrohu"); b.onclick = function(){ openAuth("login"); }; box.appendChild(b); return;
+    }
+    var name = user.displayName || (user.email||"").split("@")[0] || "Përdorues";
+    var w = el("div","who"), pic = el("div","pic");
+    if(user.photoURL){ var im = document.createElement("img"); im.alt=""; im.referrerPolicy="no-referrer"; im.src=user.photoURL; pic.appendChild(im); }
+    else pic.textContent = name.charAt(0).toUpperCase();
+    var nm = el("div","nm"); var nb = document.createElement("b"); nb.textContent = name; var ns = document.createElement("small"); ns.textContent = user.email||""; nm.appendChild(nb); nm.appendChild(ns);
+    var out = el("button","out","Dil"); out.onclick = function(){ if(busy) return; auth.signOut(); };
+    w.appendChild(pic); w.appendChild(nm); w.appendChild(out); box.appendChild(w);
+  }
+
+  function initAuth(){
+    var cfg = window.DIJA_FIREBASE || {};
+    fbOK = !!(window.firebase && cfg.apiKey && cfg.projectId);
+    if(fbOK){ try{ firebase.initializeApp(cfg); auth = firebase.auth(); }catch(e){ fbOK = false; } }
+    updateAcct();
+    if(!fbOK){ if(window.DIJA_REQUIRE_LOGIN) openAuth("login"); return; }
+    auth.onAuthStateChanged(function(u){
+      if(ctl) ctl.abort();
+      user = u || null;
+      chats = []; curId = null; load(); render(); updateAcct();
+      if(user) authModal.hidden = true;
+      else if(window.DIJA_REQUIRE_LOGIN) openAuth("login");
+    });
+  }
+
+  if(!window.firebase || !(window.DIJA_FIREBASE||{}).apiKey){ load(); render(); }
+  initAuth();
+
+  // ---------- connect to own server (/api/chat) ----------
+  sample = async function(input, opts){
+    var text = "", truncated = false, res;
+    try{
+      res = await fetch("/api/chat", {
+        method:"POST", signal:opts.signal,
+        headers:{"content-type":"application/json"},
+        body:JSON.stringify({messages:input})
+      });
+    }catch(e){ throw {code: e && e.name==="AbortError" ? "cancelled" : "network"}; }
+    if(!res.ok){
+      var det = "";
+      try{ var j = await res.json(); det = (j.status ? "Groq "+j.status+": " : "") + (j.detail || j.error || ""); }catch(e){ det = "Serveri ktheu "+res.status; }
+      throw {code: res.status===500||res.status===501 ? "server" : res.status===429 ? "rate_limited" : "upstream_error", detail: det};
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = "";
+    try{
+      while(true){
+        var r = await reader.read(); if(r.done) break;
+        buf += dec.decode(r.value, {stream:true});
+        var lines = buf.split("\n"); buf = lines.pop();
+        for(var i=0;i<lines.length;i++){
+          var ln = lines[i]; if(ln.indexOf("data: ")!==0) continue;
+          var ev; try{ ev = JSON.parse(ln.slice(6)); }catch(e){ continue; }
+          if(ev.type==="content_block_delta" && ev.delta && ev.delta.type==="text_delta"){ text += ev.delta.text; if(opts.onText) opts.onText({text:text, delta:ev.delta.text}); }
+          else if(ev.type==="message_delta" && ev.delta && ev.delta.stop_reason==="max_tokens"){ truncated = true; }
+        }
+      }
+    }catch(e){ throw {code: e && e.name==="AbortError" ? "cancelled" : "upstream_error", text:text}; }
+    if(!text) throw {code:"empty_completion"};
+    return {text:text, truncated:truncated};
+  };
+})();
+</script>
+</body>
+</html>
